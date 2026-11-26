@@ -1,0 +1,44 @@
+name: Bug report
+description: Something is broken or the stream is unstable
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not paste tokens, `.xbox.tokens.json`, gamertags, console IDs or
+        private IP addresses. See SECURITY.md.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you expected vs what happened.
+    validations:
+      required: true
+  - type: textarea
+    id: hud
+    attributes:
+      label: HUD values
+      description: latency, RTT, bitrate, decode, buffer, loss, freeze, drop, path
+      placeholder: |
+        latency 7 ms
+        path LAN
+        decode 0.3 ms
+        loss 0.00 %
+        freeze 0
+    validations:
+      required: true
+  - type: input
+    id: console
+    attributes:
+      label: Console and connection
+      placeholder: Series X, Ethernet 1 Gbps, same switch
+  - type: input
+    id: version
+    attributes:
+      label: App version / commit
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (redacted)
+      description: Remove tokens, IPs and gamertags first.
+      render: text

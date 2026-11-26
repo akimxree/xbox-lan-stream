@@ -1,0 +1,39 @@
+{
+  "name": "xbox-lan-stream",
+  "productName": "Xbox LAN Stream",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Low-latency LAN streaming client for Xbox Series X with a live latency / RTT / bitrate HUD",
+  "license": "MIT",
+  "author": "Xbox LAN Stream contributors",
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": [
+    "xbox",
+    "series-x",
+    "remote-play",
+    "webrtc",
+    "low-latency",
+    "electron",
+    "windows"
+  ],
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "setup:player": "node scripts/fetch-player.js",
+    "ics:on": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/setup-ics.ps1",
+    "ics:off": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/remove-ics.ps1",
+    "nat:on": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/nat.ps1 -Action enable",
+    "nat:off": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/nat.ps1 -Action disable",
+    "nic:tune": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/tune-nic.ps1",
+    "net:check": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/net-check.ps1",
+    "lint": "node --check src/main/main.js && node --check src/main/auth.js && node --check src/main/proxy.js && node --check src/main/net.js && node --check src/renderer/app.js && node --check src/renderer/metrics.js && node --check src/renderer/upscaler.js && node --check src/renderer/kbm-pad.js"
+  },
+  "dependencies": {
+    "xal-node": "^1.1.5"
+  },
+  "devDependencies": {
+    "electron": "^45.5.0"
+  }
+}

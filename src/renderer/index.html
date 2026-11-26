@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; media-src 'self' blob:; connect-src 'self' http://127.0.0.1:*;"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Xbox LAN Stream</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand"><span class="brand-dot"></span>XBOX<span>LAN</span></div>
+        <div class="top-actions">
+          <span id="authBadge" class="badge">инициализация</span>
+          <button id="btnSettings" class="icon-btn" title="Настройки сети">⚙</button>
+        </div>
+      </header>
+
+      <main class="main">
+        <section id="connectView" class="connect">
+          <div class="card">
+            <div class="eyebrow">Series X · локальная сеть</div>
+            <h1>Стрим без облачного видео.</h1>
+            <p class="muted">
+              Медиапоток идёт напрямую по Ethernet. Серверы Microsoft используются только для входа,
+              поиска консоли и обмена SDP/ICE — это можно проверить в HUD.
+            </p>
+
+            <div id="authBox" class="auth-box"></div>
+
+            <div class="section-head">
+              <span>Консоли</span>
+              <button id="btnRefreshConsoles" class="text-btn">обновить</button>
+            </div>
+            <div id="consoleList" class="console-list">
+              <div class="skeleton">Ожидание авторизации…</div>
+            </div>
+
+            <div class="options">
+              <label class="check">
+                <input id="optForceLan" type="checkbox" checked />
+                <span>Только LAN-кандидаты (блокировать Teredo/relay)</span>
+              </label>
+              <label class="check">
+                <input id="optGamepad" type="checkbox" checked />
+                <span>Геймпад</span>
+              </label>
+              <label class="check">
+                <input id="optMkb" type="checkbox" checked />
+                <span>Клавиатура + мышь (клик по видео — захват курсора)</span>
+              </label>
+              <label class="check">
+                <input id="optKbmPad" type="checkbox" checked />
+                <span>KBM → геймпад (GTA 6 и игры без MKB)</span>
+              </label>
+              <label class="field" style="margin: 0 0 0 26px">
+                <span>Чувствительность мыши: <b id="kbmSensValue">1.0</b></span>
+                <input id="inpKbmSens" type="range" min="0.2" max="3" step="0.05" value="1" />
+              </label>
+            </div>
+
+            <button id="btnStream" class="primary" disabled>Начать стрим</button>
+            <p id="connectError" class="error"></p>
+          </div>
+
+          <div class="facts">
+            <div><b id="factLatency">—</b><span>media RTT</span></div>
+            <div><b>1080p</b><span>потолок xHome</span></div>
+            <div><b>H.264</b><span>кодек консоли</span></div>
+            <div><b>1 Гбит</b><span>Ethernet</span></div>
+          </div>
+        </section>
+
+        <section id="streamView" class="stream hidden">
+          <div id="videoHolder" class="video-holder"></div>
+          <div id="decodeBadge" class="decode-badge hidden">—</div>
+          <div id="padProfile" class="pad-profile hidden">ON FOOT</div>
+
+          <div id="hud" class="hud">
+            <div class="hud-head">
+              <span id="m-path" class="path-pill">—</span>
+              <span id="m-state" class="hud-state">connecting</span>
+            </div>
+
+            <div class="metric hero">
+              <span class="metric-label">latency</span>
+              <span id="m-latency" class="metric-value">—</span>
+              <span class="metric-unit">ms</span>
+              <span id="m-latency-parts" class="metric-sub">—</span>
+            </div>
+
+            <div class="metric-grid">
+              <div class="metric">
+                <span class="metric-label">RTT</span>
+                <span><b id="m-rtt">—</b> <small>ms</small></span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">ICMP</span>
+                <span><b id="m-ping">—</b> <small>ms</small></span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">bitrate</span>
+                <span><b id="m-bitrate">—</b> <small>Mbps</small></span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">fps</span>
+                <span><b id="m-fps">—</b></span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">decode</span>
+                <span><b id="m-decode">—</b> <small>ms</small></span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">buffer</span>
+                <span><b id="m-buffer">—</b> <small>ms</small></span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">loss</span>
+                <span><b id="m-loss">—</b> <small>%</small></span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">jitter</span>
+                <span><b id="m-jitter">—</b> <small>ms</small></span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">freeze</span>
+                <span><b id="m-freeze">—</b> <small>s</small></span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">drop</span>
+                <span><b id="m-drop">—</b></span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">video</span>
+                <span><b id="m-res">—</b> <small id="m-codec"></small></span>
+              </div>
+            </div>
+
+            <canvas id="m-graph" width="260" height="42"></canvas>
+            <div class="hud-foot"><span id="m-remote">—</span><span>F1 · HUD</span></div>
+          </div>
+
+          <div class="stream-bar">
+            <button id="btnStop" class="ghost-btn">Остановить</button>
+            <span id="streamHint" class="hint">F1 — HUD · F3 — decode · F4 — pad profile · F11 — fullscreen · Esc — стоп</span>
+          </div>
+
+          <div id="toast" class="toast hidden"></div>
+        </section>
+      </main>
+
+      <aside id="settings" class="drawer hidden" aria-hidden="true">
+        <div class="drawer-head">
+          <h2>Сеть и сессия</h2>
+          <button id="btnCloseSettings" class="icon-btn">×</button>
+        </div>
+
+        <div class="drawer-body">
+          <section class="block">
+            <h3>Аккаунт</h3>
+            <div id="accountInfo" class="kv"></div>
+            <div class="btn-row">
+              <button id="btnRefreshAuth" class="ghost-btn small">Обновить токен</button>
+              <button id="btnLogout" class="ghost-btn small danger">Выйти</button>
+            </div>
+          </section>
+
+          <section class="block">
+            <h3>Интерфейсы</h3>
+            <div id="ifaceList" class="kv"></div>
+          </section>
+
+          <section class="block">
+            <h3>Прямой сегмент (ICS)</h3>
+            <p class="muted small">
+              Раздайте интернет на Xbox с отдельного Ethernet-порта ПК. Тогда видео идёт по кабелю
+              PC↔Xbox, минуя роутер. Требуются права администратора.
+            </p>
+            <label class="field">
+              <span>Интернет-адаптер (public)</span>
+              <select id="selPublic"></select>
+            </label>
+            <label class="field">
+              <span>Адаптер к Xbox (private)</span>
+              <select id="selPrivate"></select>
+            </label>
+            <div class="btn-row">
+              <button id="btnIcsOn" class="primary small">Включить ICS</button>
+              <button id="btnIcsOff" class="ghost-btn small danger">Выключить</button>
+            </div>
+            <div class="btn-row">
+              <button id="btnNatOn" class="ghost-btn small">NAT fallback</button>
+              <button id="btnNatOff" class="ghost-btn small danger">Убрать NAT</button>
+            </div>
+            <p class="muted small">
+              NAT fallback не раздаёт DHCP: на Xbox задайте вручную 192.168.137.2 / 255.255.255.0,
+              шлюз 192.168.137.1, DNS 1.1.1.1.
+            </p>
+            <pre id="icsStatus" class="pre">—</pre>
+          </section>
+
+          <section class="block">
+            <h3>Качество и буфер</h3>
+            <label class="field">
+              <span>Max video bitrate, kbps (0 = auto)</span>
+              <input id="inpBitrate" type="number" min="0" step="1000" value="25000" />
+            </label>
+            <label class="check" style="margin: 4px 0 10px">
+              <input id="optUpscale" type="checkbox" checked />
+              <span>Bicubic upscale + sharpen (FSR1-style)</span>
+            </label>
+            <label class="field">
+              <span>Sharpness: <b id="sharpValue">0.42</b></span>
+              <input id="inpSharp" type="range" min="0" max="1.5" step="0.02" value="0.42" />
+            </label>
+            <label class="check" style="margin: 4px 0 6px">
+              <input id="optSmooth" type="checkbox" />
+              <span>Smooth 30→45/60 (experimental)</span>
+            </label>
+            <label class="field" style="margin: 0 0 8px 26px">
+              <span>Target FPS</span>
+              <select id="selSmoothFps">
+                <option value="45" selected>45</option>
+                <option value="60">60</option>
+              </select>
+            </label>
+            <p class="muted small">
+              Только для игр с локом 30 fps. Добавляет ~1 исходный кадр задержки
+              и crossfade-ghosting; выключено по умолчанию.
+            </p>
+            <label class="check" style="margin: 4px 0 10px">
+              <input id="optLowLatency" type="checkbox" />
+              <span>Max low-latency present (uncapped, higher GPU)</span>
+            </label>
+            <p class="muted small">
+              Это верхняя граница в SDP. Реальный битрейт задаёт энкодер консоли;
+              xHome обычно упирается в ~15–25 Mbps для 1080p60.
+            </p>
+            <p class="muted small">
+              FSR 3 Frame Generation для готового видео невозможен: нужны motion
+              vectors из игры. 30→60 в клиенте не делаем — это даёт ghosting и
+              +1 кадр задержки. Для GTA 6 включите performance-режим игры.
+            </p>
+          </section>
+
+          <section class="block">
+            <h3>Приложение</h3>
+            <div id="appInfo" class="kv"></div>
+          </section>
+        </div>
+      </aside>
+
+      <div id="drawerScrim" class="scrim hidden"></div>
+    </div>
+
+    <script src="../../vendor/xbox-xcloud-player/dist/assets/xCloudPlayer.min.js"></script>
+    <script src="metrics.js"></script>
+    <script src="upscaler.js"></script>
+    <script src="kbm-pad.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

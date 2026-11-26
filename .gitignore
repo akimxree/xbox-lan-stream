@@ -1,0 +1,11 @@
+node_modules/
+vendor/xbox-xcloud-player/
+vendor/*/node_modules/
+vendor/*/dist/
+dist/
+out/
+*.log
+.electron.pid
+.xbox.tokens.json
+.DS_Store
+Thumbs.db
