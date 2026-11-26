@@ -1,4 +1,4 @@
-# Contributing
+﻿# Contributing
 
 Thanks for taking a look. This is a Windows-only Electron app for low-latency
 Xbox home streaming.
@@ -6,7 +6,7 @@ Xbox home streaming.
 ## Setup
 
 ```powershell
-git clone <this-repository-url> xbox-lan-stream
+git clone https://github.com/OWNER/xbox-lan-stream.git
 cd xbox-lan-stream
 npm install
 npm run setup:player
@@ -41,3 +41,4 @@ into `vendor/`. It is not committed.
 ## Security
 
 See [SECURITY.md](SECURITY.md). Never open a public issue with a token.
+

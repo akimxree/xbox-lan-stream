@@ -1,4 +1,4 @@
-# Xbox LAN Stream
+﻿# Xbox LAN Stream
 
 <p align="center">
   <img src="docs/banner.svg" alt="Xbox LAN Stream" width="100%">
@@ -9,7 +9,7 @@
 ![license](https://img.shields.io/badge/license-MIT-blue)
 ![status](https://img.shields.io/badge/status-MVP-orange)
 
-**English** | [Русский](README.md)
+**English** | [Р СѓСЃСЃРєРёР№](README.md)
 
 A minimal Windows client for **local** Xbox Series X streaming with a real-time
 `latency / RTT / bitrate / decode / loss` HUD.
@@ -32,7 +32,7 @@ Xbox Remote Play uses the `xHome` protocol:
 
 This project keeps the media path predictably local, shows the selected
 candidate pair, and adds low-latency presentation, metrics, sharpening, and a
-keyboard/mouse → virtual gamepad mode.
+keyboard/mouse в†’ virtual gamepad mode.
 
 **You cannot remove Microsoft entirely:** the session cannot start without the
 xHome handshake. The video itself normally never goes through Microsoft.
@@ -43,27 +43,27 @@ xHome handshake. The video itself normally never goes through Microsoft.
 - H.264 codec preference, `b=AS` + `b=TIAS` bitrate hints.
 - WebGL2 Catmull-Rom upscale + RCAS-like sharpening (FSR1-style, not FG).
 - `--disable-gpu-vsync` + `--disable-frame-rate-limit` presentation
-  (measured pipeline ~20 ms → **7–10 ms**).
+  (measured pipeline ~20 ms в†’ **7вЂ“10 ms**).
 - HUD: latency, RTT, ICMP, bitrate, FPS, decode, jitter buffer, loss, jitter,
   freeze, dropped frames, path.
 - Stall detection + automatic I-frame request.
-- Keyboard/mouse passthrough **and** KBM → virtual Xbox gamepad with context
+- Keyboard/mouse passthrough **and** KBM в†’ virtual Xbox gamepad with context
   profiles (`ON FOOT / VEHICLE / AIRCRAFT / BICYCLE`).
-- Experimental **Smooth 30→45/60** crossfade (off by default; +1 frame latency).
+- Experimental **Smooth 30в†’45/60** crossfade (off by default; +1 frame latency).
 - ICS / NAT fallback scripts and NIC tuning.
 
 ## Architecture
 
 ```
 Xbox Series X (xHome host, HW H.264)
-        │  SRTP/UDP, direct L2
-        ▼
-Windows PC — Electron / Chromium
-  main:  MSAL auth · loopback xHome proxy · ICS/NAT · ICMP
-  renderer: RTCPeerConnection · HW decode · WebGL upscale · metrics
-        │  HTTPS control plane only
-        ▼
-Microsoft: MSAL · XSTS · gssv xHome (/servers, /sessions, /sdp, /ice)
+        в”‚  SRTP/UDP, direct L2
+        в–ј
+Windows PC вЂ” Electron / Chromium
+  main:  MSAL auth В· loopback xHome proxy В· ICS/NAT В· ICMP
+  renderer: RTCPeerConnection В· HW decode В· WebGL upscale В· metrics
+        в”‚  HTTPS control plane only
+        в–ј
+Microsoft: MSAL В· XSTS В· gssv xHome (/servers, /sessions, /sdp, /ice)
 ```
 
 ## Quick start
@@ -71,14 +71,14 @@ Microsoft: MSAL · XSTS · gssv xHome (/servers, /sessions, /sdp, /ice)
 Requirements: Windows 10/11, Node.js 22+, git.
 
 ```powershell
-git clone <this-repository-url> xbox-lan-stream
+git clone https://github.com/OWNER/xbox-lan-stream.git
 cd xbox-lan-stream
 npm install
 npm run setup:player     # clones and builds xbox-xcloud-player (once)
 npm start
 ```
 
-First run: **Sign in with Microsoft** → device code → select console → Start.
+First run: **Sign in with Microsoft** в†’ device code в†’ select console в†’ Start.
 `F1` HUD, `F3` decode overlay, `F4` pad profile, `F11` fullscreen, `Esc` stop.
 
 If the Electron binary was not downloaded:
@@ -91,7 +91,7 @@ node node_modules/electron/install.js
 
 | Field | Source |
 |---|---|
-| `latency` | `RTT/2 + (expectedDisplayTime − receiveTime)` (+ smooth delay) |
+| `latency` | `RTT/2 + (expectedDisplayTime в€’ receiveTime)` (+ smooth delay) |
 | `RTT` | selected candidate-pair `currentRoundTripTime` |
 | `bitrate` | `inbound-rtp.bytesReceived` delta |
 | `decode` | `totalDecodeTime / framesDecoded` |
@@ -101,8 +101,8 @@ node node_modules/electron/install.js
 | `path` | remote candidate (`LAN` / `WAN` / `RELAY`) |
 
 Measured on a real Series X over Ethernet: 1080p60, H.264 Main 4.2,
-decode 0.25–0.4 ms, jitter buffer 0.2–0.9 ms, pipeline 7–10 ms, `freeze=0`,
-`drop=0`. The game encoder still sets the bitrate ceiling (~7–25 Mbps depending
+decode 0.25вЂ“0.4 ms, jitter buffer 0.2вЂ“0.9 ms, pipeline 7вЂ“10 ms, `freeze=0`,
+`drop=0`. The game encoder still sets the bitrate ceiling (~7вЂ“25 Mbps depending
 on content).
 
 ## Limitations
@@ -116,11 +116,12 @@ on content).
 
 ## Documentation
 
-- [Русская документация](README.md) — full setup, network, ICS/NAT, metrics.
-- [`docs/RESEARCH.md`](docs/RESEARCH.md) — protocol notes and experiments.
-- [`docs/GTA6-KEYMAP.md`](docs/GTA6-KEYMAP.md) — KBM → gamepad mapping.
-- [`docs/SMOOTH-30-45.md`](docs/SMOOTH-30-45.md) — Smooth 30→45/60.
+- [Р СѓСЃСЃРєР°СЏ РґРѕРєСѓРјРµРЅС‚Р°С†РёСЏ](README.md) вЂ” full setup, network, ICS/NAT, metrics.
+- [`docs/RESEARCH.md`](docs/RESEARCH.md) вЂ” protocol notes and experiments.
+- [`docs/GTA6-KEYMAP.md`](docs/GTA6-KEYMAP.md) вЂ” KBM в†’ gamepad mapping.
+- [`docs/SMOOTH-30-45.md`](docs/SMOOTH-30-45.md) вЂ” Smooth 30в†’45/60.
 
 ## License
 
 MIT. Xbox and Series X are trademarks of Microsoft.
+
